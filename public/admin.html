@@ -35,20 +35,18 @@
                 </select>
             </div>
 
-            <button type="submit">Opslaan</button>
+            <!-- Flex container voor submit knop en dropdown -->
+            <div class="form-row form-actions">
+                <button type="submit">Opslaan</button>
+                <select id="sorteer">
+                    <option value="van">Startdatum</option>
+                    <option value="tot">Einddatum</option>
+                    <option value="locatie">Locatie</option>
+                </select>
+            </div>
         </form>
 
-        <!-- Sorteeroptie -->
-        <div class="sorteer-container">
-            <label for="sorteer">Sorteer op:</label>
-            <select id="sorteer">
-                <option value="van">Startdatum</option>
-                <option value="tot">Einddatum</option>
-                <option value="locatie">Locatie</option>
-            </select>
-        </div>
-
-        <!-- Lijst kermissen -->
+        <!-- Lijst van kermissen -->
         <div id="lijst" class="lijst"></div>
     </div>
 
