@@ -1,0 +1,62 @@
+/* Algemene container */
+.MMM-Kermis .kermis-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 18px;
+}
+
+/* Kaart per kermis */
+.MMM-Kermis .kermis-item {
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+    line-height: 1.4;
+}
+
+/* Locatie titel */
+.MMM-Kermis .kermis-item strong {
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* Omschrijving */
+.MMM-Kermis .kermis-item em {
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+/* Formaat-kleuren */
+.MMM-Kermis .kermis-item.klein {
+    border-left: 6px solid #4caf50; /* groen */
+}
+
+.MMM-Kermis .kermis-item.middel {
+    border-left: 6px solid #ff9800; /* oranje */
+}
+
+.MMM-Kermis .kermis-item.groot {
+    border-left: 6px solid #f44336; /* rood */
+}
+
+/* Datumregel */
+.MMM-Kermis .kermis-datum {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+/* Geen items */
+.MMM-Kermis .kermis-leeg {
+    font-style: italic;
+    opacity: 0.6;
+}
+
+/* Responsive (kleinere schermen) */
+@media (max-width: 800px) {
+    .MMM-Kermis .kermis-wrapper {
+        font-size: 16px;
+    }
+}
