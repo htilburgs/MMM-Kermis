@@ -1,10 +1,17 @@
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const dag = String(date.getDate()).padStart(2, '0');
+    const maand = String(date.getMonth() + 1).padStart(2, '0');
+    const jaar = date.getFullYear();
+    return `${dag}-${maand}-${jaar}`;
+}
+
 async function load() {
     const res = await fetch("/api/kermis");
     const data = await res.json();
     const lijst = document.getElementById("lijst");
 
     lijst.innerHTML = data.map(i => {
-        // Kleur en icoon per formaat
         let kleur = "", icoon = "";
         if(i.formaat === "klein") { kleur = "#4caf50"; icoon = "🎪"; }
         else if(i.formaat === "middel") { kleur = "#ff9800"; icoon = "🎠"; }
@@ -18,7 +25,7 @@ async function load() {
                     <input type="checkbox" class="voltooid-checkbox" data-id="${i.id}" ${checked}>
                     <span class="kaart-icoon">${icoon}</span>
                     <div class="kaart-info">
-                        <strong>${i.locatie}</strong> (${i.formaat}) — ${i.van} t/m ${i.tot}
+                        <strong>${i.locatie}</strong> (${i.formaat}) — ${formatDate(i.van)} t/m ${formatDate(i.tot)}
                     </div>
                 </div>
                 <div class="buttons">
@@ -28,7 +35,6 @@ async function load() {
         `;
     }).join("");
 
-    // Event listener voor checkboxes
     document.querySelectorAll(".voltooid-checkbox").forEach(cb => {
         const kaartInfo = cb.closest(".kaart-tekst").querySelector(".kaart-info");
         if(cb.checked) kaartInfo.classList.add("voltooid");
@@ -64,5 +70,4 @@ async function verwijder(id) {
     load();
 }
 
-// Initial load
 load();
