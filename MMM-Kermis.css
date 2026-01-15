@@ -5,16 +5,16 @@
     font-family: "Arial", sans-serif;
 }
 
-/* Kermiskaartje - compact */
+/* Kermiskaartje - aangepast */
 .MMM-Kermis .kermis-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 6px 10px;         /* padding kleiner */
+    padding: 8px 10px;         /* verticale padding 8px */
     border-radius: 10px;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
-    line-height: 1.1;          /* compacter */
-    font-size: 18px;            /* behoud lettergrootte */
+    line-height: 1.1;
+    font-size: 16px;            /* basislettertype */
     transition: background 0.3s ease;
 }
 
@@ -23,9 +23,9 @@
     background: rgba(255, 255, 255, 0.15);
 }
 
-/* Icoon links - behoud grootte */
+/* Icoon links */
 .MMM-Kermis .kermis-icoon {
-    font-size: 28px;            /* onveranderd */
+    font-size: 24px;            /* icoon 24px */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -35,23 +35,23 @@
 .MMM-Kermis .kermis-item div {
     display: flex;
     flex-direction: column;
-    margin: 0;                  /* margin weggelaten */
+    margin: 0;
     padding: 0;
 }
 
 /* Locatie (titel) */
 .MMM-Kermis .kermis-item strong {
-    font-size: 20px;            /* onveranderd */
+    font-size: 18px;            /* locatie 18px */
     letter-spacing: 0.5px;
-    line-height: 1.1;           /* compacter */
+    line-height: 1.1;
 }
 
-/* Datum onder de titel, compacter */
+/* Datum onder de titel */
 .MMM-Kermis .kermis-datum {
-    font-size: 14px;
+    font-size: 16px;            /* datum 16px */
     opacity: 0.8;
-    margin-top: 1px;            /* minder marge */
-    line-height: 1.1;           /* compacter */
+    margin-top: 1px;
+    line-height: 1.1;
 }
 
 /* Kleurindicatie per formaat */
@@ -74,18 +74,18 @@
     padding: 6px 0;
 }
 
-/* Responsive aanpassing voor kleine schermen */
+/* Responsive aanpassing */
 @media (max-width: 800px) {
     .MMM-Kermis .kermis-item {
-        font-size: 16px;
-        padding: 4px 8px;
+        font-size: 14px;
+        padding: 6px 8px;
         gap: 8px;
     }
     .MMM-Kermis .kermis-icoon {
-        font-size: 24px;
+        font-size: 20px;
     }
     .MMM-Kermis .kermis-datum {
-        font-size: 12px;
+        font-size: 14px;
     }
 }
 
@@ -95,7 +95,7 @@
     font-weight: bold;
     background: #d0f0c0; /* lichtgroen */
     color: #000;
-    padding: 2px 6px;    /* compacter */
+    padding: 4px 8px;    /* verticale padding 4px */
     border-radius: 6px;
     white-space: nowrap;
     text-align: center;
