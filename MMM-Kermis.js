@@ -1,86 +1,100 @@
 Module.register("MMM-Kermis", {
-    defaults: {
-        updateInterval: 60 * 1000, // 1 minuut
-        fadeSpeed: 4000,
-    },
 
-    start() {
-        Log.info("Starting module: " + this.name);
-        this.kermissen = [];
-        this.updateDom(0);
-        this.getData();
-        setInterval(() => this.getData(), this.config.updateInterval);
+    defaults: {
+        refreshInterval: 60 * 1000 // 1 minuut
     },
 
     getStyles() {
         return ["MMM-Kermis.css"];
     },
 
-    // Haal data op van backend
-    getData() {
-        fetch("/api/kermis")
-            .then(res => res.json())
-            .then(data => {
-                const today = new Date();
-                // Alleen niet-voltooide kermissen waarvan de einddatum >= vandaag
-                this.kermissen = data.filter(k => !k.voltooid && new Date(k.tot) >= today);
-                this.updateDom(this.config.fadeSpeed);
-            })
-            .catch(err => Log.error("MMM-Kermis: failed to fetch data", err));
+    start() {
+        this.items = [];
+        this.sendSocketNotification("GET_KERMIS_DATA");
+
+        setInterval(() => {
+            this.sendSocketNotification("GET_KERMIS_DATA");
+        }, this.config.refreshInterval);
     },
 
-    // Datum formatteren naar dd-mm-yyyy
-    formatDate(dateStr) {
-        const d = new Date(dateStr);
-        const day = String(d.getDate()).padStart(2, "0");
-        const month = String(d.getMonth() + 1).padStart(2, "0");
-        const year = d.getFullYear();
-        return `${day}-${month}-${year}`;
+    socketNotificationReceived(notification, payload) {
+        if (notification === "KERMIS_DATA") {
+            this.items = payload || [];
+            this.updateDom();
+        }
     },
 
-    // Aftel-dagen
-    getCountdown(startDateStr) {
-        const today = new Date();
-        const startDate = new Date(startDateStr);
-        const diffTime = startDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays >= 0 ? `${diffDays} dagen` : "";
-    },
-
-    // Bouw DOM elementen
     getDom() {
         const wrapper = document.createElement("div");
-        wrapper.className = "MMM-Kermis";
+        wrapper.className = "kermis-wrapper";
 
-        this.kermissen.forEach(k => {
-            const item = document.createElement("div");
-            item.className = "kermis-item";
+        if (!this.items.length) {
+            const leeg = document.createElement("div");
+            leeg.className = "kermis-leeg";
+            leeg.innerText = "Geen geplande kermissen";
+            wrapper.appendChild(leeg);
+            return wrapper;
+        }
 
-            // Icoon en kleur per formaat
-            const icoonMap = {
-                klein: "🎪",
-                middel: "🎠",
-                groot: "🎡"
-            };
-            const kleurMap = {
-                klein: "#4caf50",
-                middel: "#ff9800",
-                groot: "#f44336"
-            };
+        const vandaag = new Date();
 
-            item.innerHTML = `
-                <span class="kermis-icoon">${icoonMap[k.formaat]}</span>
-                <div class="kermis-info">
-                    <span class="kermis-locatie">${k.locatie}</span>
-                    <span class="kermis-datum">${this.formatDate(k.van)} t/m ${this.formatDate(k.tot)}</span>
-                </div>
-                <div class="kermis-aftel">${this.getCountdown(k.van)}</div>
-            `;
-            item.querySelector(".kermis-icoon").style.color = kleurMap[k.formaat];
+        // Filter: niet voltooid + einddatum >= vandaag
+        const zichtbaar = this.items
+            .filter(item => {
+                if (item.voltooid) return false;
+                const eind = new Date(item.tot);
+                return eind >= vandaag;
+            })
+            .sort((a, b) => new Date(a.van) - new Date(b.van));
 
-            wrapper.appendChild(item);
+        if (!zichtbaar.length) {
+            const leeg = document.createElement("div");
+            leeg.className = "kermis-leeg";
+            leeg.innerText = "Geen actuele kermissen";
+            wrapper.appendChild(leeg);
+            return wrapper;
+        }
+
+        zichtbaar.forEach(item => {
+            wrapper.appendChild(this.createItem(item));
         });
 
         return wrapper;
+    },
+
+    createItem(item) {
+        const container = document.createElement("div");
+        container.className = `kermis-item ${item.formaat}`;
+
+        const titel = document.createElement("strong");
+        titel.innerText = item.locatie;
+
+        const datum = document.createElement("div");
+        datum.className = "kermis-datum";
+        datum.innerText = `${this.formatDate(item.van)} t/m ${this.formatDate(item.tot)}`;
+
+        const omschrijving = document.createElement("div");
+        omschrijving.className = "kermis-omschrijving";
+        omschrijving.innerText = item.omschrijving;
+
+        const formaat = document.createElement("em");
+        formaat.innerText = `Formaat: ${item.formaat}`;
+
+        container.appendChild(titel);
+        container.appendChild(datum);
+        container.appendChild(omschrijving);
+        container.appendChild(formaat);
+
+        return container;
+    },
+
+    formatDate(dateString) {
+        const d = new Date(dateString);
+        return d.toLocaleDateString("nl-NL", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
     }
+
 });
