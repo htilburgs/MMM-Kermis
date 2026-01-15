@@ -54,22 +54,38 @@
                 else if(i.formaat === "middel") { kleur = "#ff9800"; icoon = "🎠"; }
                 else if(i.formaat === "groot") { kleur = "#f44336"; icoon = "🎡"; }
 
+                const checked = i.voltooid ? "checked" : "";
+
                 return `
                     <div class="kermis-kaart" style="border-left:6px solid ${kleur}">
                         <div class="kaart-tekst">
+                            <input type="checkbox" class="voltooid-checkbox" data-id="${i.id}" ${checked}>
                             <span class="kaart-icoon">${icoon}</span>
-                            <div>
+                            <div class="kaart-info">
                                 <strong>${i.locatie}</strong> (${i.formaat})<br>
                                 ${i.van} t/m ${i.tot}
                             </div>
                         </div>
                         <div class="buttons">
-                            <button onclick="voltooi(${i.id})" class="voltooi">Voltooid</button>
                             <button onclick="verwijder(${i.id})" class="verwijder">Verwijder</button>
                         </div>
                     </div>
                 `;
             }).join("");
+
+            // Event listener voor checkboxes
+            document.querySelectorAll(".voltooid-checkbox").forEach(cb => {
+                cb.addEventListener("change", async e => {
+                    const id = e.target.dataset.id;
+                    const voltooid = e.target.checked;
+                    await fetch(`/api/kermis/${id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ voltooid })
+                    });
+                    load();
+                });
+            });
         }
 
         document.getElementById("form").onsubmit = async e => {
@@ -83,15 +99,6 @@
             e.target.reset();
             load();
         };
-
-        async function voltooi(id) {
-            await fetch(`/api/kermis/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ voltooid: true })
-            });
-            load();
-        }
 
         async function verwijder(id) {
             await fetch(`/api/kermis/${id}`, { method: "DELETE" });
