@@ -65,27 +65,58 @@ Module.register("MMM-Kermis", {
     createItem(item) {
         const container = document.createElement("div");
         container.className = `kermis-item ${item.formaat}`;
-
+        container.style.display = "flex";
+        container.style.alignItems = "center";
+        container.style.justifyContent = "space-between"; // tekst links, aftel-dagen rechts
+        container.style.gap = "12px";
+    
+        // Icoon per formaat
+        const icoonMap = {
+            klein: "🎪",
+            middel: "🎠",
+            groot: "🎡"
+        };
+        const icoon = document.createElement("span");
+        icoon.className = "kermis-icoon";
+        icoon.innerText = icoonMap[item.formaat] || "🎪";
+    
+        // Tekstcontainer links (locatie + datum)
+        const tekst = document.createElement("div");
+        tekst.style.display = "flex";
+        tekst.style.flexDirection = "column";
+    
         const titel = document.createElement("strong");
         titel.innerText = item.locatie;
-
+    
         const datum = document.createElement("div");
         datum.className = "kermis-datum";
         datum.innerText = `${this.formatDate(item.van)} t/m ${this.formatDate(item.tot)}`;
-
-        const omschrijving = document.createElement("div");
-        omschrijving.className = "kermis-omschrijving";
-        omschrijving.innerText = item.omschrijving;
-
-        const formaat = document.createElement("em");
-        formaat.innerText = `Formaat: ${item.formaat}`;
-
-        container.appendChild(titel);
-        container.appendChild(datum);
-        container.appendChild(omschrijving);
-        container.appendChild(formaat);
-
+    
+        tekst.appendChild(titel);
+        tekst.appendChild(datum);
+    
+        // Aftel-dagen container rechts
+        const aftel = document.createElement("div");
+        aftel.className = "kermis-aftel";
+        const dagen = this.calculateDaysUntil(item.van);
+        aftel.innerText = dagen > 0 ? `Nog ${dagen} dagen` : "Vandaag!";
+    
+        // Voeg alles toe
+        container.appendChild(icoon);
+        container.appendChild(tekst);
+        container.appendChild(aftel);
+    
         return container;
+    },
+    
+    // Bereken dagen tot startdatum
+    calculateDaysUntil(dateString) {
+        const today = new Date();
+        const start = new Date(dateString);
+        // Rond af op hele dagen
+        const diffTime = start - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
     },
 
     formatDate(dateString) {
