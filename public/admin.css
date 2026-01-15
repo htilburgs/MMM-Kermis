@@ -37,12 +37,37 @@
     border: 1px solid #ccc;
 }
 
-/* Flex container voor dropdown + submit knop */
+
+/* Flex container voor opslaan knop en dropdown */
 .form-actions {
     display: flex;
-    justify-content: space-between; /* dropdown links, knop rechts */
+    justify-content: space-between; /* knop links, dropdown rechts */
     align-items: center;
     margin-top: 10px;
+}
+
+/* Opslaan knop */
+.form-actions button[type="submit"] {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.form-actions button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Dropdown rechts */
+.form-actions select#sorteer {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    min-width: 160px;
 }
 
 .form-actions select#sorteer {
