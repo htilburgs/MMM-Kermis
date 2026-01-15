@@ -62,31 +62,43 @@ Module.register("MMM-Kermis", {
         return wrapper;
     },
 
-    createItem(item) {
-        const container = document.createElement("div");
-        container.className = `kermis-item ${item.formaat}`;
+createItem(item) {
+    const container = document.createElement("div");
+    container.className = `kermis-item ${item.formaat}`;
 
-        const titel = document.createElement("strong");
-        titel.innerText = item.locatie;
+    // Icoon per formaat
+    const icoonMap = {
+        klein: "🎪",
+        middel: "🎡",
+        groot: "🎠"
+    };
+    const icoon = document.createElement("span");
+    icoon.className = "kermis-icoon";
+    icoon.innerText = icoonMap[item.formaat] || "🎪"; // fallback
 
-        const datum = document.createElement("div");
-        datum.className = "kermis-datum";
-        datum.innerText = `${this.formatDate(item.van)} t/m ${this.formatDate(item.tot)}`;
+    const titel = document.createElement("strong");
+    titel.innerText = ` ${item.locatie}`; // spatie na icoon
 
-        const omschrijving = document.createElement("div");
-        omschrijving.className = "kermis-omschrijving";
-        omschrijving.innerText = item.omschrijving;
+    const datum = document.createElement("div");
+    datum.className = "kermis-datum";
+    datum.innerText = `${this.formatDate(item.van)} t/m ${this.formatDate(item.tot)}`;
 
-        const formaat = document.createElement("em");
-        formaat.innerText = `Formaat: ${item.formaat}`;
+    const omschrijving = document.createElement("div");
+    omschrijving.className = "kermis-omschrijving";
+    omschrijving.innerText = item.omschrijving;
 
-        container.appendChild(titel);
-        container.appendChild(datum);
-        container.appendChild(omschrijving);
-        container.appendChild(formaat);
+    const formaat = document.createElement("em");
+    formaat.innerText = `Formaat: ${item.formaat}`;
 
-        return container;
-    },
+    // Voeg elementen toe
+    container.appendChild(icoon);
+    container.appendChild(titel);
+    container.appendChild(datum);
+    container.appendChild(omschrijving);
+    container.appendChild(formaat);
+
+    return container;
+},
 
     formatDate(dateString) {
         const d = new Date(dateString);
