@@ -1,66 +1,83 @@
+const NodeHelper = require("node_helper");
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("cors");
+const fs = require("fs");
 const path = require("path");
 
-const app = express();
-const PORT = 3001;
+module.exports = NodeHelper.create({
+    start() {
+        this.dataFile = `${__dirname}/kermisdata.json`;
+        this.app = express();
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
+        // Middleware
+        this.app.use(bodyParser.json());
+        this.app.use(express.static(path.join(__dirname, "public"))); // script.js en admin.css
 
-// In-memory database
-let kermissen = [];
-let nextId = 1;
+        this.loadData();
 
-// Serve admin.html en statische bestanden (script.js, admin.css)
-app.use(express.static(path.join(__dirname, "public"))); // alles in map "public"
+        // API endpoints
+        this.app.get("/api/kermis", (req, res) => {
+            res.json(this.data);
+        });
 
-// Routes API
-app.get("/api/kermis", (req, res) => res.json(kermissen));
+        this.app.get("/api/kermis/:id", (req, res) => {
+            const id = parseInt(req.params.id, 10);
+            const item = this.data.find(i => i.id === id);
+            if (!item) return res.status(404).json({ error: "Niet gevonden" });
+            res.json(item);
+        });
 
-app.get("/api/kermis/:id", (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const k = kermissen.find(k => k.id === id);
-    if (!k) return res.status(404).json({ error: "Niet gevonden" });
-    res.json(k);
-});
+        this.app.post("/api/kermis", (req, res) => {
+            this.data.push({
+                id: Date.now(),
+                ...req.body,
+                voltooid: false
+            });
+            this.saveData();
+            res.sendStatus(200);
+        });
 
-app.post("/api/kermis", (req, res) => {
-    const { locatie, van, tot, formaat } = req.body;
-    const newKermis = { id: nextId++, locatie, van, tot, formaat, voltooid: false };
-    kermissen.push(newKermis);
-    res.status(201).json(newKermis);
-});
+        this.app.put("/api/kermis/:id", (req, res) => {
+            const index = this.data.findIndex(i => i.id == req.params.id);
+            if (index === -1) return res.status(404).json({ error: "Niet gevonden" });
+            this.data[index] = { ...this.data[index], ...req.body };
+            this.saveData();
+            res.sendStatus(200);
+        });
 
-app.put("/api/kermis/:id", (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const k = kermissen.find(k => k.id === id);
-    if (!k) return res.status(404).json({ error: "Niet gevonden" });
+        this.app.delete("/api/kermis/:id", (req, res) => {
+            this.data = this.data.filter(i => i.id != req.params.id);
+            this.saveData();
+            res.sendStatus(200);
+        });
 
-    const { locatie, van, tot, formaat, voltooid } = req.body;
-    if (locatie !== undefined) k.locatie = locatie;
-    if (van !== undefined) k.van = van;
-    if (tot !== undefined) k.tot = tot;
-    if (formaat !== undefined) k.formaat = formaat;
-    if (voltooid !== undefined) k.voltooid = voltooid;
+        // **Serve admin.html automatisch op /** 
+        this.app.get("/", (req, res) => {
+            res.sendFile(path.join(__dirname, "public/admin.html"));
+        });
 
-    res.json(k);
-});
+        // Start server op poort 3001
+        this.app.listen(3001, () => {
+            console.log("MMM-Kermis server draait op http://localhost:3001");
+        });
+    },
 
-app.delete("/api/kermis/:id", (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    kermissen = kermissen.filter(k => k.id !== id);
-    res.status(204).send();
-});
+    loadData() {
+        if (fs.existsSync(this.dataFile)) {
+            this.data = JSON.parse(fs.readFileSync(this.dataFile));
+        } else {
+            this.data = [];
+        }
+    },
 
-// Default route: serveer admin.html
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/admin.html"));
-});
+    saveData() {
+        fs.writeFileSync(this.dataFile, JSON.stringify(this.data, null, 2));
+        this.sendSocketNotification("KERMIS_DATA", this.data);
+    },
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server draait op http://localhost:${PORT}`);
+    socketNotificationReceived(notification) {
+        if (notification === "GET_KERMIS_DATA") {
+            this.sendSocketNotification("KERMIS_DATA", this.data);
+        }
+    }
 });
