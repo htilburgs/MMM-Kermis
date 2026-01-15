@@ -2,38 +2,41 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>Kermis Beheer</title>
+    <title>Admin Kermis</title>
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
     <div class="container">
-        <h1>Kermis Beheer</h1>
+        <h1>Admin Kermis</h1>
 
         <form id="form" class="form">
             <div class="form-row">
-                <label>Locatie</label>
-                <input name="locatie" required>
+                <label for="locatie">Locatie</label>
+                <input type="text" id="locatie" name="locatie" required>
             </div>
+
             <div class="form-row">
-                <label>Van</label>
-                <input type="date" name="van" required>
+                <label for="van">Van (yyyy-mm-dd)</label>
+                <input type="date" id="van" name="van" required>
             </div>
+
             <div class="form-row">
-                <label>Tot</label>
-                <input type="date" name="tot" required>
+                <label for="tot">Tot (yyyy-mm-dd)</label>
+                <input type="date" id="tot" name="tot" required>
             </div>
+
             <div class="form-row">
-                <label>Formaat</label>
-                <select name="formaat" required>
-                    <option value="klein">klein</option>
-                    <option value="middel">middel</option>
-                    <option value="groot">groot</option>
+                <label for="formaat">Formaat</label>
+                <select id="formaat" name="formaat" required>
+                    <option value="klein">Klein</option>
+                    <option value="middel">Middel</option>
+                    <option value="groot">Groot</option>
                 </select>
             </div>
+
             <button type="submit">Opslaan</button>
         </form>
 
-        <hr>
         <div id="lijst" class="lijst"></div>
     </div>
 
