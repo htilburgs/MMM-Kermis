@@ -1,23 +1,25 @@
 Module.register("MMM-Kermis", {
+
     defaults: {
-        refreshInterval: 60 * 1000,
+        refreshInterval: 60 * 1000 // 1 minuut
+    },
+
+    getStyles() {
+        return ["MMM-Kermis.css"];
     },
 
     start() {
         this.items = [];
-        this.getData();
-        setInterval(() => {
-            this.getData();
-        }, this.config.refreshInterval);
-    },
-
-    getData() {
         this.sendSocketNotification("GET_KERMIS_DATA");
+
+        setInterval(() => {
+            this.sendSocketNotification("GET_KERMIS_DATA");
+        }, this.config.refreshInterval);
     },
 
     socketNotificationReceived(notification, payload) {
         if (notification === "KERMIS_DATA") {
-            this.items = payload;
+            this.items = payload || [];
             this.updateDom();
         }
     },
@@ -26,31 +28,73 @@ Module.register("MMM-Kermis", {
         const wrapper = document.createElement("div");
         wrapper.className = "kermis-wrapper";
 
-        if (this.items.length === 0) {
-            wrapper.innerHTML = "Geen geplande kermissen";
+        if (!this.items.length) {
+            const leeg = document.createElement("div");
+            leeg.className = "kermis-leeg";
+            leeg.innerText = "Geen geplande kermissen";
+            wrapper.appendChild(leeg);
             return wrapper;
         }
 
-        const now = new Date();
+        const vandaag = new Date();
 
-        this.items.forEach(item => {
-            const endDate = new Date(item.tot);
+        // Filter: niet voltooid + einddatum >= vandaag
+        const zichtbaar = this.items
+            .filter(item => {
+                if (item.voltooid) return false;
+                const eind = new Date(item.tot);
+                return eind >= vandaag;
+            })
+            .sort((a, b) => new Date(a.van) - new Date(b.van));
 
-            if (item.voltooid || endDate < now) return;
+        if (!zichtbaar.length) {
+            const leeg = document.createElement("div");
+            leeg.className = "kermis-leeg";
+            leeg.innerText = "Geen actuele kermissen";
+            wrapper.appendChild(leeg);
+            return wrapper;
+        }
 
-            const div = document.createElement("div");
-            div.className = `kermis-item ${item.formaat}`;
-
-            div.innerHTML = `
-                <strong>${item.locatie}</strong><br>
-                ${item.omschrijving}<br>
-                ${item.van} t/m ${item.tot}<br>
-                <em>Formaat: ${item.formaat}</em>
-            `;
-
-            wrapper.appendChild(div);
+        zichtbaar.forEach(item => {
+            wrapper.appendChild(this.createItem(item));
         });
 
         return wrapper;
+    },
+
+    createItem(item) {
+        const container = document.createElement("div");
+        container.className = `kermis-item ${item.formaat}`;
+
+        const titel = document.createElement("strong");
+        titel.innerText = item.locatie;
+
+        const datum = document.createElement("div");
+        datum.className = "kermis-datum";
+        datum.innerText = `${this.formatDate(item.van)} t/m ${this.formatDate(item.tot)}`;
+
+        const omschrijving = document.createElement("div");
+        omschrijving.className = "kermis-omschrijving";
+        omschrijving.innerText = item.omschrijving;
+
+        const formaat = document.createElement("em");
+        formaat.innerText = `Formaat: ${item.formaat}`;
+
+        container.appendChild(titel);
+        container.appendChild(datum);
+        container.appendChild(omschrijving);
+        container.appendChild(formaat);
+
+        return container;
+    },
+
+    formatDate(dateString) {
+        const d = new Date(dateString);
+        return d.toLocaleDateString("nl-NL", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
     }
+
 });
