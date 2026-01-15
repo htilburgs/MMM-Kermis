@@ -16,10 +16,6 @@
                 <input name="locatie" required>
             </div>
             <div class="form-row">
-                <label>Omschrijving</label>
-                <input name="omschrijving">
-            </div>
-            <div class="form-row">
                 <label>Van</label>
                 <input type="date" name="van" required>
             </div>
@@ -30,9 +26,9 @@
             <div class="form-row">
                 <label>Formaat</label>
                 <select name="formaat" required>
-                    <option>klein</option>
-                    <option>middel</option>
-                    <option>groot</option>
+                    <option value="klein">klein</option>
+                    <option value="middel">middel</option>
+                    <option value="groot">groot</option>
                 </select>
             </div>
             <button type="submit">Opslaan</button>
@@ -45,25 +41,36 @@
     </div>
 
     <script>
+        // Laden van kermissen
         async function load() {
             const res = await fetch("/api/kermis");
             const data = await res.json();
 
             const lijst = document.getElementById("lijst");
-            lijst.innerHTML = data.map(i => `
-                <div class="kermis-kaart">
-                    <div>
-                        <strong>${i.locatie}</strong> (${i.formaat})<br>
-                        ${i.van} t/m ${i.tot}
+
+            lijst.innerHTML = data.map(i => {
+                // Kleurindicatie per formaat
+                let kleur = "";
+                if(i.formaat === "klein") kleur = "#4caf50";
+                else if(i.formaat === "middel") kleur = "#ff9800";
+                else if(i.formaat === "groot") kleur = "#f44336";
+
+                return `
+                    <div class="kermis-kaart" style="border-left:6px solid ${kleur}">
+                        <div>
+                            <strong>${i.locatie}</strong> (${i.formaat})<br>
+                            ${i.van} t/m ${i.tot}
+                        </div>
+                        <div class="buttons">
+                            <button onclick="voltooi(${i.id})" class="voltooi">Voltooid</button>
+                            <button onclick="verwijder(${i.id})" class="verwijder">Verwijder</button>
+                        </div>
                     </div>
-                    <div class="buttons">
-                        <button onclick="voltooi(${i.id})" class="voltooi">Voltooid</button>
-                        <button onclick="verwijder(${i.id})" class="verwijder">Verwijder</button>
-                    </div>
-                </div>
-            `).join("");
+                `;
+            }).join("");
         }
 
+        // Formulier submit
         document.getElementById("form").onsubmit = async e => {
             e.preventDefault();
             const formData = Object.fromEntries(new FormData(e.target));
@@ -76,6 +83,7 @@
             load();
         };
 
+        // Voltooid markeren
         async function voltooi(id) {
             await fetch(`/api/kermis/${id}`, {
                 method: "PUT",
@@ -85,6 +93,7 @@
             load();
         }
 
+        // Verwijderen
         async function verwijder(id) {
             await fetch(`/api/kermis/${id}`, { method: "DELETE" });
             load();
