@@ -10,42 +10,42 @@
         <h1>Admin Kermis</h1>
 
         <!-- Formulier -->
-    <form id="form" class="form">
-        <div class="form-row">
-            <label for="locatie">Locatie</label>
-            <input type="text" id="locatie" name="locatie" required>
-        </div>
-    
-        <div class="form-row">
-            <label for="van">Van</label>
-            <input type="date" id="van" name="van" required>
-        </div>
-        
-        <div class="form-row">
-            <label for="tot">Tot</label>
-            <input type="date" id="tot" name="tot" required>
-        </div>
-    
-        <div class="form-row">
-            <label for="formaat">Formaat</label>
-            <select id="formaat" name="formaat" required>
-                <option value="klein">Klein</option>
-                <option value="middel">Middel</option>
-                <option value="groot">Groot</option>
-            </select>
-        </div>
-    
-        <!-- Flex container voor submit knop en dropdown -->
-        <div class="form-row form-actions">
-            <button type="submit">Opslaan</button>
-            <select id="sorteer">
-                <option value="van">Startdatum</option>
-                <option value="tot">Einddatum</option>
-                <option value="locatie">Locatie</option>
-            </select>
-        </div>
-    </form>
-        
+        <form id="form" class="form">
+            <div class="form-row">
+                <label for="locatie">Locatie</label>
+                <input type="text" id="locatie" name="locatie" required>
+            </div>
+
+            <div class="form-row">
+                <label for="van">Van</label>
+                <input type="date" id="van" name="van" required>
+            </div>
+            
+            <div class="form-row">
+                <label for="tot">Tot</label>
+                <input type="date" id="tot" name="tot" required>
+            </div>
+
+            <div class="form-row">
+                <label for="formaat">Formaat</label>
+                <select id="formaat" name="formaat" required>
+                    <option value="klein">Klein</option>
+                    <option value="middel">Middel</option>
+                    <option value="groot">Groot</option>
+                </select>
+            </div>
+
+            <!-- Flex container: Opslaan links, dropdown rechts -->
+            <div class="form-row form-actions">
+                <button type="submit">Opslaan</button>
+                <select id="sorteer">
+                    <option value="van">Startdatum</option>
+                    <option value="tot">Einddatum</option>
+                    <option value="locatie">Locatie</option>
+                </select>
+            </div>
+        </form>
+
         <!-- Lijst van kermissen -->
         <div id="lijst" class="lijst"></div>
     </div>
