@@ -1,68 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 <head>
+    <meta charset="UTF-8">
     <title>Kermis Beheer</title>
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<h2>Kermis invoer</h2>
+    <div class="container">
+        <h1>Kermis Beheer</h1>
 
-<form id="form">
-    Locatie: <input name="locatie"><br>
-    Omschrijving: <input name="omschrijving"><br>
-    Van: <input type="date" name="van"><br>
-    Tot: <input type="date" name="tot"><br>
-    Formaat:
-    <select name="formaat">
-        <option>klein</option>
-        <option>middel</option>
-        <option>groot</option>
-    </select><br>
-    <button>Opslaan</button>
-</form>
+        <!-- Formulier -->
+        <form id="form" class="form">
+            <div class="form-row">
+                <label>Locatie</label>
+                <input name="locatie" required>
+            </div>
+            <div class="form-row">
+                <label>Omschrijving</label>
+                <input name="omschrijving">
+            </div>
+            <div class="form-row">
+                <label>Van</label>
+                <input type="date" name="van" required>
+            </div>
+            <div class="form-row">
+                <label>Tot</label>
+                <input type="date" name="tot" required>
+            </div>
+            <div class="form-row">
+                <label>Formaat</label>
+                <select name="formaat" required>
+                    <option>klein</option>
+                    <option>middel</option>
+                    <option>groot</option>
+                </select>
+            </div>
+            <button type="submit">Opslaan</button>
+        </form>
 
-<hr>
-<div id="lijst"></div>
+        <hr>
 
-<script>
-async function load() {
-    const res = await fetch("/api/kermis");
-    const data = await res.json();
+        <!-- Kermis lijst -->
+        <div id="lijst" class="lijst"></div>
+    </div>
 
-    document.getElementById("lijst").innerHTML = data.map(i => `
-        <div>
-            ${i.locatie} (${i.formaat})
-            <button onclick="voltooi(${i.id})">Voltooid</button>
-            <button onclick="verwijder(${i.id})">Verwijder</button>
-        </div>
-    `).join("");
-}
+    <script>
+        async function load() {
+            const res = await fetch("/api/kermis");
+            const data = await res.json();
 
-document.getElementById("form").onsubmit = async e => {
-    e.preventDefault();
-    const formData = Object.fromEntries(new FormData(e.target));
-    await fetch("/api/kermis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-    });
-    load();
-};
+            const lijst = document.getElementById("lijst");
+            lijst.innerHTML = data.map(i => `
+                <div class="kermis-kaart">
+                    <div>
+                        <strong>${i.locatie}</strong> (${i.formaat})<br>
+                        ${i.van} t/m ${i.tot}
+                    </div>
+                    <div class="buttons">
+                        <button onclick="voltooi(${i.id})" class="voltooi">Voltooid</button>
+                        <button onclick="verwijder(${i.id})" class="verwijder">Verwijder</button>
+                    </div>
+                </div>
+            `).join("");
+        }
 
-async function voltooi(id) {
-    await fetch(`/api/kermis/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ voltooid: true })
-    });
-    load();
-}
+        document.getElementById("form").onsubmit = async e => {
+            e.preventDefault();
+            const formData = Object.fromEntries(new FormData(e.target));
+            await fetch("/api/kermis", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+            e.target.reset();
+            load();
+        };
 
-async function verwijder(id) {
-    await fetch(`/api/kermis/${id}`, { method: "DELETE" });
-    load();
-}
+        async function voltooi(id) {
+            await fetch(`/api/kermis/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ voltooid: true })
+            });
+            load();
+        }
 
-load();
-</script>
+        async function verwijder(id) {
+            await fetch(`/api/kermis/${id}`, { method: "DELETE" });
+            load();
+        }
+
+        load();
+    </script>
 </body>
 </html>
