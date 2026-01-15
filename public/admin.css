@@ -46,11 +46,13 @@ h1 {
     font-size: 14px;
 }
 
-/* Flex container voor opslaan-knop en sorteer dropdown */
+/* Flex container voor Opslaan + dropdown horizontaal */
 .form-actions {
     display: flex;
-    justify-content: space-between; /* knop links, dropdown rechts */
+    flex-direction: row; /* horizontaal naast elkaar */
+    justify-content: flex-start; /* knop links */
     align-items: center;
+    gap: 16px; /* ruimte tussen knop en dropdown */
     margin-top: 10px;
 }
 
