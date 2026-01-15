@@ -47,9 +47,7 @@
             const lijst = document.getElementById("lijst");
 
             lijst.innerHTML = data.map(i => {
-                // Kleur en icoon per formaat
-                let kleur = "";
-                let icoon = "";
+                let kleur = "", icoon = "";
                 if(i.formaat === "klein") { kleur = "#4caf50"; icoon = "🎪"; }
                 else if(i.formaat === "middel") { kleur = "#ff9800"; icoon = "🎠"; }
                 else if(i.formaat === "groot") { kleur = "#f44336"; icoon = "🎡"; }
@@ -62,8 +60,7 @@
                             <input type="checkbox" class="voltooid-checkbox" data-id="${i.id}" ${checked}>
                             <span class="kaart-icoon">${icoon}</span>
                             <div class="kaart-info">
-                                <strong>${i.locatie}</strong> (${i.formaat})<br>
-                                ${i.van} t/m ${i.tot}
+                                <strong>${i.locatie}</strong> (${i.formaat}) — ${i.van} t/m ${i.tot}
                             </div>
                         </div>
                         <div class="buttons">
@@ -75,6 +72,10 @@
 
             // Event listener voor checkboxes
             document.querySelectorAll(".voltooid-checkbox").forEach(cb => {
+                const kaartInfo = cb.closest(".kaart-tekst").querySelector(".kaart-info");
+                // Initieel visueel toepassen
+                if(cb.checked) kaartInfo.classList.add("voltooid");
+
                 cb.addEventListener("change", async e => {
                     const id = e.target.dataset.id;
                     const voltooid = e.target.checked;
@@ -83,7 +84,8 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ voltooid })
                     });
-                    load();
+                    if(voltooid) kaartInfo.classList.add("voltooid");
+                    else kaartInfo.classList.remove("voltooid");
                 });
             });
         }
