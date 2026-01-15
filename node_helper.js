@@ -1,74 +1,64 @@
+const NodeHelper = require("node_helper");
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("cors");
-const app = express();
-const PORT = 3001;
+const fs = require("fs");
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
+module.exports = NodeHelper.create({
+    start() {
+        this.dataFile = `${__dirname}/kermisdata.json`;
+        this.app = express();
 
-// In-memory database (voor demo)
-let kermissen = [];
-let nextId = 1;
+        this.app.use(bodyParser.json());
+        this.app.use(express.static(`${__dirname}/public`));
 
-// GET all kermissen
-app.get("/api/kermis", (req, res) => {
-    res.json(kermissen);
-});
+        this.loadData();
 
-// GET kermis by ID
-app.get("/api/kermis/:id", (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const kermis = kermissen.find(k => k.id === id);
-    if (!kermis) return res.status(404).json({ error: "Niet gevonden" });
-    res.json(kermis);
-});
+        this.app.get("/api/kermis", (req, res) => {
+            res.json(this.data);
+        });
 
-// POST new kermis
-app.post("/api/kermis", (req, res) => {
-    const { locatie, van, tot, formaat } = req.body;
-    if (!locatie || !van || !tot || !formaat) return res.status(400).json({ error: "Ontbrekende velden" });
+        this.app.post("/api/kermis", (req, res) => {
+            this.data.push({
+                id: Date.now(),
+                ...req.body,
+                voltooid: false
+            });
+            this.saveData();
+            res.sendStatus(200);
+        });
 
-    const newKermis = {
-        id: nextId++,
-        locatie,
-        van,
-        tot,
-        formaat,
-        voltooid: false
-    };
-    kermissen.push(newKermis);
-    res.status(201).json(newKermis);
-});
+        this.app.put("/api/kermis/:id", (req, res) => {
+            const index = this.data.findIndex(i => i.id == req.params.id);
+            this.data[index] = { ...this.data[index], ...req.body };
+            this.saveData();
+            res.sendStatus(200);
+        });
 
-// PUT update kermis
-app.put("/api/kermis/:id", (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const kermis = kermissen.find(k => k.id === id);
-    if (!kermis) return res.status(404).json({ error: "Niet gevonden" });
+        this.app.delete("/api/kermis/:id", (req, res) => {
+            this.data = this.data.filter(i => i.id != req.params.id);
+            this.saveData();
+            res.sendStatus(200);
+        });
 
-    // Update velden
-    const { locatie, van, tot, formaat, voltooid } = req.body;
-    if (locatie !== undefined) kermis.locatie = locatie;
-    if (van !== undefined) kermis.van = van;
-    if (tot !== undefined) kermis.tot = tot;
-    if (formaat !== undefined) kermis.formaat = formaat;
-    if (voltooid !== undefined) kermis.voltooid = voltooid;
+        this.app.listen(3001);
+    },
 
-    res.json(kermis);
-});
+    loadData() {
+        if (fs.existsSync(this.dataFile)) {
+            this.data = JSON.parse(fs.readFileSync(this.dataFile));
+        } else {
+            this.data = [];
+        }
+    },
 
-// DELETE kermis
-app.delete("/api/kermis/:id", (req, res) => {
-    const id = parseInt(req.params.id, 10);
-    const index = kermissen.findIndex(k => k.id === id);
-    if (index === -1) return res.status(404).json({ error: "Niet gevonden" });
-    kermissen.splice(index, 1);
-    res.status(204).send();
-});
+    saveData() {
+        fs.writeFileSync(this.dataFile, JSON.stringify(this.data, null, 2));
+        this.sendSocketNotification("KERMIS_DATA", this.data);
+    },
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Backend server draait op http://localhost:${PORT}`);
+    socketNotificationReceived(notification) {
+        if (notification === "GET_KERMIS_DATA") {
+            this.sendSocketNotification("KERMIS_DATA", this.data);
+        }
+    }
 });
