@@ -5,16 +5,16 @@
     font-family: "Arial", sans-serif;
 }
 
-/* Kermiskaartje - compacte hoogte */
+/* Kermiskaartje */
 .MMM-Kermis .kermis-item {
     display: flex;
-    align-items: center;          /* icoon en tekst verticaal uitlijnen */
+    align-items: center;
     gap: 12px;
-    padding: 2px 10px;            /* minimale verticale padding */
+    padding: 10px 14px;
     border-radius: 10px;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
-    line-height: 1.1;
-    font-size: 18px;               /* basislettertype */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    line-height: 1.2;
+    font-size: 18px;
     transition: background 0.3s ease;
 }
 
@@ -25,7 +25,7 @@
 
 /* Icoon links */
 .MMM-Kermis .kermis-icoon {
-    font-size: 28px;               /* icoonhoogte bepaalt kaart hoogte */
+    font-size: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -35,24 +35,19 @@
 .MMM-Kermis .kermis-item div {
     display: flex;
     flex-direction: column;
-    justify-content: center;       /* verticaal centreren t.o.v. icoon */
-    margin: 0;
-    padding: 0;
 }
 
 /* Locatie (titel) */
 .MMM-Kermis .kermis-item strong {
-    font-size: 18px;
+    font-size: 20px;
     letter-spacing: 0.5px;
-    line-height: 1.1;
 }
 
 /* Datum onder de titel */
 .MMM-Kermis .kermis-datum {
-    font-size: 16px;
+    font-size: 14px;
     opacity: 0.8;
-    margin-top: 1px;
-    line-height: 1.1;
+    margin-top: 2px;
 }
 
 /* Kleurindicatie per formaat */
@@ -72,21 +67,21 @@
 .MMM-Kermis .kermis-leeg {
     font-style: italic;
     opacity: 0.6;
-    padding: 6px 0;
+    padding: 10px;
 }
 
-/* Responsive voor kleinere schermen */
+/* Responsive aanpassing voor kleine schermen */
 @media (max-width: 800px) {
     .MMM-Kermis .kermis-item {
         font-size: 16px;
-        padding: 2px 8px;
+        padding: 8px 10px;
         gap: 8px;
     }
     .MMM-Kermis .kermis-icoon {
         font-size: 24px;
     }
     .MMM-Kermis .kermis-datum {
-        font-size: 14px;
+        font-size: 12px;
     }
 }
 
@@ -95,12 +90,10 @@
     font-size: 14px;
     font-weight: bold;
     background: #d0f0c0; /* lichtgroen */
-    color: #000;
-    padding: 4px 8px;    /* verticaal 4px */
+    color: #000; /* zwart voor leesbaarheid */
+    padding: 4px 8px;
     border-radius: 6px;
     white-space: nowrap;
     text-align: center;
     min-width: 70px;
-    display: flex;
-    align-items: center;  /* verticaal centreren t.o.v. icoon */
 }
