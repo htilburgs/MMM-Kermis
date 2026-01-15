@@ -1,6 +1,6 @@
-let editId = null; // Houdt bij welke kermis wordt aangepast
+let editId = null; // Voor Wijzig functie
 
-// Datum formatteren naar dd-mm-yyyy
+// Datum formatteren dd-mm-yyyy voor weergave in lijst
 function formatDate(dateString) {
     const date = new Date(dateString);
     const dag = String(date.getDate()).padStart(2, '0');
@@ -40,7 +40,7 @@ async function load() {
         `;
     }).join("");
 
-    // Event listeners na het genereren
+    // Event listeners
     document.querySelectorAll(".voltooid-checkbox").forEach(cb => {
         const kaartInfo = cb.closest(".kaart-tekst").querySelector(".kaart-info");
         if (cb.checked) kaartInfo.classList.add("voltooid");
@@ -66,18 +66,13 @@ async function load() {
         });
     });
 
-    // Wijzig knop
     document.querySelectorAll(".buttons .wijzig").forEach(btn => {
         btn.addEventListener("click", async e => {
             const id = btn.closest(".kermis-kaart").dataset.id;
             const res = await fetch(`/api/kermis/${id}`);
-            if (!res.ok) {
-                alert("Kon kermis niet ophalen!");
-                return;
-            }
+            if (!res.ok) { alert("Kon kermis niet ophalen!"); return; }
             const k = await res.json();
 
-            // Vul formulier
             const form = document.getElementById("form");
             form.locatie.value = k.locatie;
             form.van.value = k.van;
