@@ -79,6 +79,11 @@ button[type="submit"]:hover {
     padding: 12px 16px;
     border-radius: 10px;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    transition: background 0.2s ease;
+}
+
+.kermis-kaart:hover {
+    background: #f0f0f0;
 }
 
 /* Knoppen in lijst */
