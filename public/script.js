@@ -1,4 +1,6 @@
-// Helper: datum formatteren naar dd-mm-yyyy
+let editId = null; // Voor Wijzig functie
+
+// Datum formatteren dd-mm-yyyy voor weergave in lijst
 function formatDate(dateString) {
     const date = new Date(dateString);
     const dag = String(date.getDate()).padStart(2, '0');
@@ -15,9 +17,9 @@ async function load() {
 
     lijst.innerHTML = data.map(k => {
         let kleur = "", icoon = "";
-        if(k.formaat === "klein") { kleur = "#4caf50"; icoon = "🎪"; }
-        else if(k.formaat === "middel") { kleur = "#ff9800"; icoon = "🎠"; }
-        else if(k.formaat === "groot") { kleur = "#f44336"; icoon = "🎡"; }
+        if (k.formaat === "klein") { kleur = "#4caf50"; icoon = "🎪"; }
+        else if (k.formaat === "middel") { kleur = "#ff9800"; icoon = "🎠"; }
+        else if (k.formaat === "groot") { kleur = "#f44336"; icoon = "🎡"; }
 
         const checked = k.voltooid ? "checked" : "";
 
@@ -31,16 +33,17 @@ async function load() {
                     </div>
                 </div>
                 <div class="buttons">
+                    <button class="wijzig">Wijzig</button>
                     <button class="verwijder">Verwijder</button>
                 </div>
             </div>
         `;
     }).join("");
 
-    // Checkbox voltooid event
+    // Event listeners
     document.querySelectorAll(".voltooid-checkbox").forEach(cb => {
         const kaartInfo = cb.closest(".kaart-tekst").querySelector(".kaart-info");
-        if(cb.checked) kaartInfo.classList.add("voltooid");
+        if (cb.checked) kaartInfo.classList.add("voltooid");
 
         cb.addEventListener("change", async e => {
             const id = cb.closest(".kermis-kaart").dataset.id;
@@ -50,12 +53,11 @@ async function load() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ voltooid })
             });
-            if(voltooid) kaartInfo.classList.add("voltooid");
+            if (voltooid) kaartInfo.classList.add("voltooid");
             else kaartInfo.classList.remove("voltooid");
         });
     });
 
-    // Verwijder-knoppen
     document.querySelectorAll(".buttons .verwijder").forEach(btn => {
         btn.addEventListener("click", async e => {
             const id = btn.closest(".kermis-kaart").dataset.id;
@@ -63,18 +65,48 @@ async function load() {
             load();
         });
     });
+
+    document.querySelectorAll(".buttons .wijzig").forEach(btn => {
+        btn.addEventListener("click", async e => {
+            const id = btn.closest(".kermis-kaart").dataset.id;
+            const res = await fetch(`/api/kermis/${id}`);
+            if (!res.ok) { alert("Kon kermis niet ophalen!"); return; }
+            const k = await res.json();
+
+            const form = document.getElementById("form");
+            form.locatie.value = k.locatie;
+            form.van.value = k.van;
+            form.tot.value = k.tot;
+            form.formaat.value = k.formaat;
+
+            editId = id;
+            form.querySelector("button[type='submit']").textContent = "Bijwerken";
+        });
+    });
 }
 
-// Formulier submit: opslaan
+// Formulier submit
 document.getElementById("form").onsubmit = async e => {
     e.preventDefault();
     const formData = Object.fromEntries(new FormData(e.target));
 
-    await fetch("/api/kermis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-    });
+    if (editId) {
+        // Update bestaande kermis
+        await fetch(`/api/kermis/${editId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+        editId = null;
+        e.target.querySelector("button[type='submit']").textContent = "Opslaan";
+    } else {
+        // Nieuwe kermis toevoegen
+        await fetch("/api/kermis", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+    }
 
     e.target.reset();
     load();
