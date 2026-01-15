@@ -12,7 +12,6 @@ body {
     margin: 0 auto;
 }
 
-/* Kop */
 h1 {
     text-align: center;
     margin-bottom: 20px;
@@ -47,7 +46,6 @@ h1 {
     font-size: 16px;
 }
 
-/* Formulier knop */
 button[type="submit"] {
     padding: 10px 16px;
     background: #4caf50;
@@ -105,7 +103,16 @@ button[type="submit"]:hover {
 
 .kaart-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    gap: 6px;
+    font-size: 14px;
+    align-items: center;
+}
+
+/* Voltooid effect */
+.kaart-info.voltooid {
+    color: #999;
+    text-decoration: line-through;
 }
 
 /* Verwijder knop */
@@ -133,5 +140,10 @@ button[type="submit"]:hover {
 
     .buttons {
         margin-top: 8px;
+    }
+
+    .kaart-info {
+        flex-direction: column;
+        gap: 2px;
     }
 }
