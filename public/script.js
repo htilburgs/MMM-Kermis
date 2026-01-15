@@ -1,5 +1,26 @@
 let editId = null; // Houd bij welke kermis wordt gewijzigd
 
+// Globale functies zodat onclick werkt
+window.wijzig = async function(id) {
+    const res = await fetch(`/api/kermis/${id}`);
+    const kermis = await res.json();
+
+    const form = document.getElementById("form");
+    form.locatie.value = kermis.locatie;
+    form.van.value = kermis.van;
+    form.tot.value = kermis.tot;
+    form.formaat.value = kermis.formaat;
+
+    editId = id;
+    form.querySelector("button[type='submit']").textContent = "Bijwerken";
+};
+
+window.verwijder = async function(id) {
+    await fetch(`/api/kermis/${id}`, { method: "DELETE" });
+    load();
+};
+
+// Helper: datum formatteren naar dd-mm-yyyy
 function formatDate(dateString) {
     const date = new Date(dateString);
     const dag = String(date.getDate()).padStart(2, '0');
@@ -8,6 +29,7 @@ function formatDate(dateString) {
     return `${dag}-${maand}-${jaar}`;
 }
 
+// Load kermissen en bouw de lijst
 async function load() {
     const res = await fetch("/api/kermis");
     const data = await res.json();
@@ -38,7 +60,7 @@ async function load() {
         `;
     }).join("");
 
-    // Checkbox voltooid event
+    // Event listener voor checkbox voltooid
     document.querySelectorAll(".voltooid-checkbox").forEach(cb => {
         const kaartInfo = cb.closest(".kaart-tekst").querySelector(".kaart-info");
         if(cb.checked) kaartInfo.classList.add("voltooid");
@@ -57,29 +79,14 @@ async function load() {
     });
 }
 
-// Wijzig bestaande kermis
-async function wijzig(id) {
-    const res = await fetch(`/api/kermis/${id}`);
-    const kermis = await res.json();
-
-    const form = document.getElementById("form");
-    form.locatie.value = kermis.locatie;
-    form.van.value = kermis.van;
-    form.tot.value = kermis.tot;
-    form.formaat.value = kermis.formaat;
-
-    editId = id;
-    form.querySelector("button[type='submit']").textContent = "Bijwerken";
-}
-
-// Formulier submit
+// Formulier submit: opslaan of bijwerken
 document.getElementById("form").onsubmit = async e => {
     e.preventDefault();
     const formData = Object.fromEntries(new FormData(e.target));
     const form = e.target;
 
     if(editId) {
-        // Update bestaande
+        // Update bestaande kermis
         await fetch(`/api/kermis/${editId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -87,7 +94,7 @@ document.getElementById("form").onsubmit = async e => {
         });
         editId = null;
     } else {
-        // Nieuwe kermis
+        // Nieuwe kermis toevoegen
         await fetch("/api/kermis", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -99,12 +106,6 @@ document.getElementById("form").onsubmit = async e => {
     form.querySelector("button[type='submit']").textContent = "Opslaan";
     load();
 };
-
-// Verwijder kermis
-async function verwijder(id) {
-    await fetch(`/api/kermis/${id}`, { method: "DELETE" });
-    load();
-}
 
 // Initial load
 load();
