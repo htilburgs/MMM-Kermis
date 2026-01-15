@@ -65,6 +65,9 @@ Module.register("MMM-Kermis", {
 createItem(item) {
     const container = document.createElement("div");
     container.className = `kermis-item ${item.formaat}`;
+    container.style.display = "flex";
+    container.style.alignItems = "center";
+    container.style.gap = "12px"; // ruimte tussen icoon en tekst
 
     // Icoon per formaat
     const icoonMap = {
@@ -74,28 +77,25 @@ createItem(item) {
     };
     const icoon = document.createElement("span");
     icoon.className = "kermis-icoon";
-    icoon.innerText = icoonMap[item.formaat] || "🎪"; // fallback
+    icoon.innerText = icoonMap[item.formaat] || "🎪";
+
+    // Tekstcontainer rechts
+    const tekst = document.createElement("div");
+    tekst.style.display = "flex";
+    tekst.style.flexDirection = "column";
 
     const titel = document.createElement("strong");
-    titel.innerText = ` ${item.locatie}`; // spatie na icoon
+    titel.innerText = item.locatie;
 
     const datum = document.createElement("div");
     datum.className = "kermis-datum";
     datum.innerText = `${this.formatDate(item.van)} t/m ${this.formatDate(item.tot)}`;
 
-    const omschrijving = document.createElement("div");
-    omschrijving.className = "kermis-omschrijving";
-    omschrijving.innerText = item.omschrijving;
+    tekst.appendChild(titel);
+    tekst.appendChild(datum);
 
-    const formaat = document.createElement("em");
-    formaat.innerText = `Formaat: ${item.formaat}`;
-
-    // Voeg elementen toe
     container.appendChild(icoon);
-    container.appendChild(titel);
-    container.appendChild(datum);
-    container.appendChild(omschrijving);
-    container.appendChild(formaat);
+    container.appendChild(tekst);
 
     return container;
 },
