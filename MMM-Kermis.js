@@ -1,131 +1,78 @@
 Module.register("MMM-Kermis", {
-
     defaults: {
-        refreshInterval: 60 * 1000 // 1 minuut
+        updateInterval: 60 * 1000, // elke minuut
+        fadeSpeed: 4000,
+    },
+
+    start() {
+        this.kermissen = [];
+        this.updateDom(0);
+        this.getData();
+        setInterval(() => this.getData(), this.config.updateInterval);
+    },
+
+    getData() {
+        fetch("/api/kermis")
+            .then(res => res.json())
+            .then(data => {
+                const today = new Date();
+                this.kermissen = data.filter(k => !k.voltooid && new Date(k.tot) >= today);
+                this.updateDom(this.config.fadeSpeed);
+            });
     },
 
     getStyles() {
         return ["MMM-Kermis.css"];
     },
 
-    start() {
-        this.items = [];
-        this.sendSocketNotification("GET_KERMIS_DATA");
-
-        setInterval(() => {
-            this.sendSocketNotification("GET_KERMIS_DATA");
-        }, this.config.refreshInterval);
-    },
-
-    socketNotificationReceived(notification, payload) {
-        if (notification === "KERMIS_DATA") {
-            this.items = payload || [];
-            this.updateDom();
-        }
+    formatDate(dateStr) {
+        const d = new Date(dateStr);
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}-${month}-${year}`;
     },
 
     getDom() {
         const wrapper = document.createElement("div");
-        wrapper.className = "kermis-wrapper";
+        wrapper.className = "MMM-Kermis";
 
-        if (!this.items.length) {
-            const leeg = document.createElement("div");
-            leeg.className = "kermis-leeg";
-            leeg.innerText = "Geen geplande kermissen";
-            wrapper.appendChild(leeg);
-            return wrapper;
-        }
+        this.kermissen.forEach(k => {
+            const item = document.createElement("div");
+            item.className = "kermis-item";
 
-        const vandaag = new Date();
+            // Icoon per formaat
+            const icoonMap = {
+                klein: "🎪",
+                middel: "🎠",
+                groot: "🎡"
+            };
+            const kleurMap = {
+                klein: "#4caf50",
+                middel: "#ff9800",
+                groot: "#f44336"
+            };
 
-        // Filter: niet voltooid + einddatum >= vandaag
-        const zichtbaar = this.items
-            .filter(item => {
-                if (item.voltooid) return false;
-                const eind = new Date(item.tot);
-                return eind >= vandaag;
-            })
-            .sort((a, b) => new Date(a.van) - new Date(b.van));
-
-        if (!zichtbaar.length) {
-            const leeg = document.createElement("div");
-            leeg.className = "kermis-leeg";
-            leeg.innerText = "Geen actuele kermissen";
-            wrapper.appendChild(leeg);
-            return wrapper;
-        }
-
-        zichtbaar.forEach(item => {
-            wrapper.appendChild(this.createItem(item));
+            item.innerHTML = `
+                <span class="kermis-icoon">${icoonMap[k.formaat]}</span>
+                <div class="kermis-info">
+                    <span class="kermis-locatie">${k.locatie}</span>
+                    <span class="kermis-datum">${this.formatDate(k.van)} t/m ${this.formatDate(k.tot)}</span>
+                </div>
+                <div class="kermis-aftel">${this.getCountdown(k.van)}</div>
+            `;
+            item.querySelector(".kermis-icoon").style.color = kleurMap[k.formaat];
+            wrapper.appendChild(item);
         });
 
         return wrapper;
     },
 
-    createItem(item) {
-        const container = document.createElement("div");
-        container.className = `kermis-item ${item.formaat}`;
-        container.style.display = "flex";
-        container.style.alignItems = "center";
-        container.style.justifyContent = "space-between"; // tekst links, aftel-dagen rechts
-        container.style.gap = "12px";
-    
-        // Icoon per formaat
-        const icoonMap = {
-            klein: "🎪",
-            middel: "🎠",
-            groot: "🎡"
-        };
-        const icoon = document.createElement("span");
-        icoon.className = "kermis-icoon";
-        icoon.innerText = icoonMap[item.formaat] || "🎪";
-    
-        // Tekstcontainer links (locatie + datum)
-        const tekst = document.createElement("div");
-        tekst.style.display = "flex";
-        tekst.style.flexDirection = "column";
-    
-        const titel = document.createElement("strong");
-        titel.innerText = item.locatie;
-    
-        const datum = document.createElement("div");
-        datum.className = "kermis-datum";
-        datum.innerText = `${this.formatDate(item.van)} t/m ${this.formatDate(item.tot)}`;
-    
-        tekst.appendChild(titel);
-        tekst.appendChild(datum);
-    
-        // Aftel-dagen container rechts
-        const aftel = document.createElement("div");
-        aftel.className = "kermis-aftel";
-        const dagen = this.calculateDaysUntil(item.van);
-        aftel.innerText = dagen > 0 ? `Nog ${dagen} dagen` : "Vandaag!";
-    
-        // Voeg alles toe
-        container.appendChild(icoon);
-        container.appendChild(tekst);
-        container.appendChild(aftel);
-    
-        return container;
-    },
-
-// Bereken dagen tot startdatum
-calculateDaysUntil(dateString) {
-    const today = new Date();
-    const start = new Date(dateString);
-    // Rond af op hele dagen
-    const diffTime = start - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-},
-
-    formatDate(dateString) {
-        const d = new Date(dateString);
-        return d.toLocaleDateString("nl-NL", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        });
+    getCountdown(startDateStr) {
+        const today = new Date();
+        const startDate = new Date(startDateStr);
+        const diffTime = startDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays >= 0 ? `${diffDays} dagen` : "";
     }
-
 });
