@@ -41,25 +41,27 @@
     </div>
 
     <script>
-        // Laden van kermissen
         async function load() {
             const res = await fetch("/api/kermis");
             const data = await res.json();
-
             const lijst = document.getElementById("lijst");
 
             lijst.innerHTML = data.map(i => {
-                // Kleurindicatie per formaat
+                // Kleur en icoon per formaat
                 let kleur = "";
-                if(i.formaat === "klein") kleur = "#4caf50";
-                else if(i.formaat === "middel") kleur = "#ff9800";
-                else if(i.formaat === "groot") kleur = "#f44336";
+                let icoon = "";
+                if(i.formaat === "klein") { kleur = "#4caf50"; icoon = "🎪"; }
+                else if(i.formaat === "middel") { kleur = "#ff9800"; icoon = "🎠"; }
+                else if(i.formaat === "groot") { kleur = "#f44336"; icoon = "🎡"; }
 
                 return `
                     <div class="kermis-kaart" style="border-left:6px solid ${kleur}">
-                        <div>
-                            <strong>${i.locatie}</strong> (${i.formaat})<br>
-                            ${i.van} t/m ${i.tot}
+                        <div class="kaart-tekst">
+                            <span class="kaart-icoon">${icoon}</span>
+                            <div>
+                                <strong>${i.locatie}</strong> (${i.formaat})<br>
+                                ${i.van} t/m ${i.tot}
+                            </div>
                         </div>
                         <div class="buttons">
                             <button onclick="voltooi(${i.id})" class="voltooi">Voltooid</button>
@@ -70,7 +72,6 @@
             }).join("");
         }
 
-        // Formulier submit
         document.getElementById("form").onsubmit = async e => {
             e.preventDefault();
             const formData = Object.fromEntries(new FormData(e.target));
@@ -83,7 +84,6 @@
             load();
         };
 
-        // Voltooid markeren
         async function voltooi(id) {
             await fetch(`/api/kermis/${id}`, {
                 method: "PUT",
@@ -93,7 +93,6 @@
             load();
         }
 
-        // Verwijderen
         async function verwijder(id) {
             await fetch(`/api/kermis/${id}`, { method: "DELETE" });
             load();
