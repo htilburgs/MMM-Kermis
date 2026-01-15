@@ -84,3 +84,15 @@
         font-size: 12px;
     }
 }
+
+/* Aftel-dagen blok rechts */
+.MMM-Kermis .kermis-aftel {
+    font-size: 14px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 70px;
+}
