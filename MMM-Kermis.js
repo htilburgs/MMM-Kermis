@@ -1,30 +1,35 @@
 Module.register("MMM-Kermis", {
     defaults: {
-        updateInterval: 60 * 1000, // elke minuut
+        updateInterval: 60 * 1000, // 1 minuut
         fadeSpeed: 4000,
     },
 
     start() {
+        Log.info("Starting module: " + this.name);
         this.kermissen = [];
         this.updateDom(0);
         this.getData();
         setInterval(() => this.getData(), this.config.updateInterval);
     },
 
+    getStyles() {
+        return ["MMM-Kermis.css"];
+    },
+
+    // Haal data op van backend
     getData() {
         fetch("/api/kermis")
             .then(res => res.json())
             .then(data => {
                 const today = new Date();
+                // Alleen niet-voltooide kermissen waarvan de einddatum >= vandaag
                 this.kermissen = data.filter(k => !k.voltooid && new Date(k.tot) >= today);
                 this.updateDom(this.config.fadeSpeed);
-            });
+            })
+            .catch(err => Log.error("MMM-Kermis: failed to fetch data", err));
     },
 
-    getStyles() {
-        return ["MMM-Kermis.css"];
-    },
-
+    // Datum formatteren naar dd-mm-yyyy
     formatDate(dateStr) {
         const d = new Date(dateStr);
         const day = String(d.getDate()).padStart(2, "0");
@@ -33,6 +38,16 @@ Module.register("MMM-Kermis", {
         return `${day}-${month}-${year}`;
     },
 
+    // Aftel-dagen
+    getCountdown(startDateStr) {
+        const today = new Date();
+        const startDate = new Date(startDateStr);
+        const diffTime = startDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays >= 0 ? `${diffDays} dagen` : "";
+    },
+
+    // Bouw DOM elementen
     getDom() {
         const wrapper = document.createElement("div");
         wrapper.className = "MMM-Kermis";
@@ -41,7 +56,7 @@ Module.register("MMM-Kermis", {
             const item = document.createElement("div");
             item.className = "kermis-item";
 
-            // Icoon per formaat
+            // Icoon en kleur per formaat
             const icoonMap = {
                 klein: "🎪",
                 middel: "🎠",
@@ -62,17 +77,10 @@ Module.register("MMM-Kermis", {
                 <div class="kermis-aftel">${this.getCountdown(k.van)}</div>
             `;
             item.querySelector(".kermis-icoon").style.color = kleurMap[k.formaat];
+
             wrapper.appendChild(item);
         });
 
         return wrapper;
-    },
-
-    getCountdown(startDateStr) {
-        const today = new Date();
-        const startDate = new Date(startDateStr);
-        const diffTime = startDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays >= 0 ? `${diffDays} dagen` : "";
     }
 });
