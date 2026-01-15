@@ -1,3 +1,5 @@
+let editId = null; // Houd bij welke kermis wordt gewijzigd
+
 function formatDate(dateString) {
     const date = new Date(dateString);
     const dag = String(date.getDate()).padStart(2, '0');
@@ -11,30 +13,32 @@ async function load() {
     const data = await res.json();
     const lijst = document.getElementById("lijst");
 
-    lijst.innerHTML = data.map(i => {
+    lijst.innerHTML = data.map(k => {
         let kleur = "", icoon = "";
-        if(i.formaat === "klein") { kleur = "#4caf50"; icoon = "🎪"; }
-        else if(i.formaat === "middel") { kleur = "#ff9800"; icoon = "🎠"; }
-        else if(i.formaat === "groot") { kleur = "#f44336"; icoon = "🎡"; }
+        if(k.formaat === "klein") { kleur = "#4caf50"; icoon = "🎪"; }
+        else if(k.formaat === "middel") { kleur = "#ff9800"; icoon = "🎠"; }
+        else if(k.formaat === "groot") { kleur = "#f44336"; icoon = "🎡"; }
 
-        const checked = i.voltooid ? "checked" : "";
+        const checked = k.voltooid ? "checked" : "";
 
         return `
             <div class="kermis-kaart" style="border-left:6px solid ${kleur}">
                 <div class="kaart-tekst">
-                    <input type="checkbox" class="voltooid-checkbox" data-id="${i.id}" ${checked}>
+                    <input type="checkbox" class="voltooid-checkbox" data-id="${k.id}" ${checked}>
                     <span class="kaart-icoon">${icoon}</span>
                     <div class="kaart-info">
-                        <strong>${i.locatie}</strong> (${i.formaat}) — ${formatDate(i.van)} t/m ${formatDate(i.tot)}
+                        <strong>${k.locatie}</strong> (${k.formaat}) — ${formatDate(k.van)} t/m ${formatDate(k.tot)}
                     </div>
                 </div>
                 <div class="buttons">
-                    <button onclick="verwijder(${i.id})" class="verwijder">Verwijder</button>
+                    <button onclick="wijzig(${k.id})" class="wijzig">Wijzig</button>
+                    <button onclick="verwijder(${k.id})" class="verwijder">Verwijder</button>
                 </div>
             </div>
         `;
     }).join("");
 
+    // Checkbox voltooid event
     document.querySelectorAll(".voltooid-checkbox").forEach(cb => {
         const kaartInfo = cb.closest(".kaart-tekst").querySelector(".kaart-info");
         if(cb.checked) kaartInfo.classList.add("voltooid");
@@ -53,21 +57,54 @@ async function load() {
     });
 }
 
+// Wijzig bestaande kermis
+async function wijzig(id) {
+    const res = await fetch(`/api/kermis/${id}`);
+    const kermis = await res.json();
+
+    const form = document.getElementById("form");
+    form.locatie.value = kermis.locatie;
+    form.van.value = kermis.van;
+    form.tot.value = kermis.tot;
+    form.formaat.value = kermis.formaat;
+
+    editId = id;
+    form.querySelector("button[type='submit']").textContent = "Bijwerken";
+}
+
+// Formulier submit
 document.getElementById("form").onsubmit = async e => {
     e.preventDefault();
     const formData = Object.fromEntries(new FormData(e.target));
-    await fetch("/api/kermis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-    });
-    e.target.reset();
+    const form = e.target;
+
+    if(editId) {
+        // Update bestaande
+        await fetch(`/api/kermis/${editId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+        editId = null;
+    } else {
+        // Nieuwe kermis
+        await fetch("/api/kermis", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+    }
+
+    form.reset();
+    form.querySelector("button[type='submit']").textContent = "Opslaan";
     load();
 };
 
+// Verwijder kermis
 async function verwijder(id) {
     await fetch(`/api/kermis/${id}`, { method: "DELETE" });
     load();
 }
 
+// Initial load
 load();
