@@ -9,6 +9,7 @@
     <div class="container">
         <h1>Admin Kermis</h1>
 
+        <!-- Formulier -->
         <form id="form" class="form">
             <div class="form-row">
                 <label for="locatie">Locatie</label>
@@ -34,9 +35,18 @@
                 </select>
             </div>
 
-            <button type="submit">Opslaan</button>
+            <!-- Flex container: Opslaan + dropdown direct naast elkaar -->
+            <div class="form-row form-actions">
+                <button type="submit">Opslaan</button>
+                <select id="sorteer">
+                    <option value="van">Startdatum</option>
+                    <option value="tot">Einddatum</option>
+                    <option value="locatie">Locatie</option>
+                </select>
+            </div>
         </form>
 
+        <!-- Lijst van kermissen -->
         <div id="lijst" class="lijst"></div>
     </div>
 

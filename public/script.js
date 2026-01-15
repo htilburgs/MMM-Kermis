@@ -1,20 +1,26 @@
-let editId = null; // Voor Wijzig functie
+let editId = null; // Huidige wijziging
 
-// Datum formatteren dd-mm-yyyy voor weergave in lijst
+// Formatteer datum voor weergave dd-mm-yyyy
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    const dag = String(date.getDate()).padStart(2, '0');
-    const maand = String(date.getMonth() + 1).padStart(2, '0');
-    const jaar = date.getFullYear();
+    const d = new Date(dateString);
+    const dag = String(d.getDate()).padStart(2, '0');
+    const maand = String(d.getMonth() + 1).padStart(2, '0');
+    const jaar = d.getFullYear();
     return `${dag}-${maand}-${jaar}`;
 }
 
-// Lijst renderen
+// Load en render de lijst
 async function load() {
     const res = await fetch("/api/kermis");
-    const data = await res.json();
-    const lijst = document.getElementById("lijst");
+    let data = await res.json();
 
+    // Sorteer op dropdown
+    const sortOpt = document.getElementById("sorteer").value;
+    if (sortOpt === "van") data.sort((a, b) => new Date(a.van) - new Date(b.van));
+    else if (sortOpt === "tot") data.sort((a, b) => new Date(a.tot) - new Date(b.tot));
+    else if (sortOpt === "locatie") data.sort((a, b) => a.locatie.localeCompare(b.locatie));
+
+    const lijst = document.getElementById("lijst");
     lijst.innerHTML = data.map(k => {
         let kleur = "", icoon = "";
         if (k.formaat === "klein") { kleur = "#4caf50"; icoon = "🎪"; }
@@ -40,7 +46,7 @@ async function load() {
         `;
     }).join("");
 
-    // Event listeners
+    // Checkbox voltooid
     document.querySelectorAll(".voltooid-checkbox").forEach(cb => {
         const kaartInfo = cb.closest(".kaart-tekst").querySelector(".kaart-info");
         if (cb.checked) kaartInfo.classList.add("voltooid");
@@ -58,6 +64,7 @@ async function load() {
         });
     });
 
+    // Verwijder knop
     document.querySelectorAll(".buttons .verwijder").forEach(btn => {
         btn.addEventListener("click", async e => {
             const id = btn.closest(".kermis-kaart").dataset.id;
@@ -66,6 +73,7 @@ async function load() {
         });
     });
 
+    // Wijzig knop
     document.querySelectorAll(".buttons .wijzig").forEach(btn => {
         btn.addEventListener("click", async e => {
             const id = btn.closest(".kermis-kaart").dataset.id;
@@ -111,6 +119,9 @@ document.getElementById("form").onsubmit = async e => {
     e.target.reset();
     load();
 };
+
+// Sorteer dropdown change
+document.getElementById("sorteer").addEventListener("change", load);
 
 // Initial load
 load();
