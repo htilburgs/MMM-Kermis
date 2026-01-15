@@ -141,22 +141,3 @@
 .voltooid-checkbox {
     cursor: pointer;
 }
-
-/* Responsive */
-@media (max-width: 600px) {
-    .form-actions {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    .form-actions select#sorteer {
-        width: 100%;
-    }
-
-    .buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-}
