@@ -37,12 +37,20 @@
     border: 1px solid #ccc;
 }
 
-/* Flex container voor opslaan en dropdown */
+/* Flex container voor dropdown + submit knop */
 .form-actions {
     display: flex;
-    justify-content: space-between; /* Opslaan links, dropdown rechts */
+    justify-content: space-between; /* dropdown links, knop rechts */
     align-items: center;
     margin-top: 10px;
+}
+
+.form-actions select#sorteer {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    min-width: 160px;
 }
 
 .form-actions button[type="submit"] {
@@ -57,14 +65,6 @@
 
 .form-actions button[type="submit"]:hover {
     background-color: #45a049;
-}
-
-.form-actions select#sorteer {
-    padding: 8px 12px;
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    min-width: 160px;
 }
 
 /* Lijst kermissen */
