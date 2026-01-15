@@ -72,9 +72,10 @@ createItem(item) {
     // Icoon per formaat
     const icoonMap = {
         klein: "🎪",
-        middel: "🎡",
-        groot: "🎠"
+        middel: "🎠", 
+        groot: "🎡"    
     };
+    
     const icoon = document.createElement("span");
     icoon.className = "kermis-icoon";
     icoon.innerText = icoonMap[item.formaat] || "🎪";
