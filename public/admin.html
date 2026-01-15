@@ -9,6 +9,7 @@
     <div class="container">
         <h1>Admin Kermis</h1>
 
+        <!-- Formulier -->
         <form id="form" class="form">
             <div class="form-row">
                 <label for="locatie">Locatie</label>
@@ -37,6 +38,17 @@
             <button type="submit">Opslaan</button>
         </form>
 
+        <!-- Sorteeroptie -->
+        <div class="sorteer-container">
+            <label for="sorteer">Sorteer op:</label>
+            <select id="sorteer">
+                <option value="van">Startdatum</option>
+                <option value="tot">Einddatum</option>
+                <option value="locatie">Locatie</option>
+            </select>
+        </div>
+
+        <!-- Lijst kermissen -->
         <div id="lijst" class="lijst"></div>
     </div>
 
