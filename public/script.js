@@ -39,55 +39,49 @@ async function load() {
             </div>
         `;
     }).join("");
+}
+
+// Event delegation op container
+const lijst = document.getElementById("lijst");
+
+lijst.addEventListener("click", async e => {
+    const kaart = e.target.closest(".kermis-kaart");
+    if(!kaart) return;
+    const id = kaart.dataset.id;
 
     // Checkbox voltooid
-    document.querySelectorAll(".voltooid-checkbox").forEach(cb => {
-        const kaartInfo = cb.closest(".kaart-tekst").querySelector(".kaart-info");
-        if(cb.checked) kaartInfo.classList.add("voltooid");
-
-        cb.addEventListener("change", async e => {
-            const kaart = e.target.closest(".kermis-kaart");
-            const id = kaart.dataset.id;
-            const voltooid = e.target.checked;
-            await fetch(`/api/kermis/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ voltooid })
-            });
-            if(voltooid) kaartInfo.classList.add("voltooid");
-            else kaartInfo.classList.remove("voltooid");
+    if(e.target.classList.contains("voltooid-checkbox")) {
+        const voltooid = e.target.checked;
+        const kaartInfo = kaart.querySelector(".kaart-info");
+        await fetch(`/api/kermis/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ voltooid })
         });
-    });
+        if(voltooid) kaartInfo.classList.add("voltooid");
+        else kaartInfo.classList.remove("voltooid");
+    }
 
-    // Wijzig-knoppen
-    document.querySelectorAll(".buttons .wijzig").forEach(btn => {
-        btn.addEventListener("click", async e => {
-            const kaart = e.target.closest(".kermis-kaart");
-            const id = kaart.dataset.id;
-            const res = await fetch(`/api/kermis/${id}`);
-            const kermis = await res.json();
+    // Wijzig knop
+    if(e.target.classList.contains("wijzig")) {
+        const res = await fetch(`/api/kermis/${id}`);
+        const kermis = await res.json();
+        const form = document.getElementById("form");
+        form.locatie.value = kermis.locatie;
+        form.van.value = kermis.van;
+        form.tot.value = kermis.tot;
+        form.formaat.value = kermis.formaat;
 
-            const form = document.getElementById("form");
-            form.locatie.value = kermis.locatie;
-            form.van.value = kermis.van;
-            form.tot.value = kermis.tot;
-            form.formaat.value = kermis.formaat;
+        editId = id;
+        form.querySelector("button[type='submit']").textContent = "Bijwerken";
+    }
 
-            editId = id;
-            form.querySelector("button[type='submit']").textContent = "Bijwerken";
-        });
-    });
-
-    // Verwijder-knoppen
-    document.querySelectorAll(".buttons .verwijder").forEach(btn => {
-        btn.addEventListener("click", async e => {
-            const kaart = e.target.closest(".kermis-kaart");
-            const id = kaart.dataset.id;
-            await fetch(`/api/kermis/${id}`, { method: "DELETE" });
-            load();
-        });
-    });
-}
+    // Verwijder knop
+    if(e.target.classList.contains("verwijder")) {
+        await fetch(`/api/kermis/${id}`, { method: "DELETE" });
+        load();
+    }
+});
 
 // Formulier submit: opslaan of bijwerken
 document.getElementById("form").onsubmit = async e => {
