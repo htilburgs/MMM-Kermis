@@ -59,3 +59,4 @@ All the updates are instantly published on your Mirror
 
 ## Versions
 v1.0.0  - Initial release </br>
+v1.1.0  - Update for Chromium, install fonts-noto-color-emoji 
