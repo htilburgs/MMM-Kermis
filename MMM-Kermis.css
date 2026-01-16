@@ -2,7 +2,7 @@
 .MMM-Kermis .kermis-wrapper {
     display: flex;
     flex-direction: column;
-    font-family: "Arial", sans-serif;
+    font-family: "Arial", sans-serif, "Noto Color Emoji", "Segoe UI Emoji", "Apple Color Emoji", sans-serif;
 }
 
 /* Kermiskaartje */

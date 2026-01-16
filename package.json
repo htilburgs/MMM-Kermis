@@ -1,0 +1,13 @@
+{
+  "name": "MMM-Kermis",
+  "version": "1.0.0",
+  "description": "MagicMirror module voor kermissen",
+  "main": "MMM-Kermis.js",
+  "scripts": {
+    "postinstall": "node scripts/install-font.js"
+  },
+  "dependencies": {},
+  "keywords": ["magicmirror", "kermis"],
+  "author": "",
+  "license": "MIT"
+}
