@@ -64,4 +64,4 @@ All the updates are instantly published on your Mirror
 ## Versions
 v1.0.0  - Initial release </br>
 v1.1.0  - Update for Chromium, install fonts-noto-color-emoji </br>
-v1.1.1  - Visuele aanpassingen, showMaxItems parameter toegevoegd
+v1.1.1  - Visuele aanpassingen en showMaxItems parameter toegevoegd
