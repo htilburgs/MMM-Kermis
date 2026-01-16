@@ -36,7 +36,8 @@ Add the module to your modules array in your config.js.
   header: "Mijn Kermissen",
   disabled: false,
   config: {
-          refreshInterval: 60 * 1000 // 1 minuut
+          refreshInterval: 60 * 1000,   // 1 minuut
+          showMaxItems: 5               // null is geen limiet
           }
 },
 ```
@@ -62,4 +63,5 @@ All the updates are instantly published on your Mirror
 
 ## Versions
 v1.0.0  - Initial release </br>
-v1.1.0  - Update for Chromium, install fonts-noto-color-emoji 
+v1.1.0  - Update for Chromium, install fonts-noto-color-emoji </br>
+v1.1.1  - Visuele aanpassingen en showMaxItems parameter toegevoegd
