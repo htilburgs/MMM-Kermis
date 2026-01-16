@@ -1,99 +1,53 @@
-/* Algemene wrapper */
-.MMM-Kermis .kermis-wrapper {
+.kermis-wrapper {
     display: flex;
     flex-direction: column;
-    font-family: "Arial", sans-serif, "Noto Color Emoji", "Segoe UI Emoji", "Apple Color Emoji", sans-serif;
+    gap: 6px; /* kleiner tussen items */
 }
 
-/* Kermiskaartje */
-.MMM-Kermis .kermis-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
-    line-height: 1.2;
-    font-size: 18px;
-    transition: background 0.3s ease;
-}
-
-/* Hover effect voor kaarten */
-.MMM-Kermis .kermis-item:hover {
-    background: rgba(255, 255, 255, 0.15);
-}
-
-/* Icoon links */
-.MMM-Kermis .kermis-icoon {
-    font-size: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Tekstcontainer rechts */
-.MMM-Kermis .kermis-item div {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Locatie (titel) */
-.MMM-Kermis .kermis-item strong {
-    font-size: 20px;
-    letter-spacing: 0.5px;
-}
-
-/* Datum onder de titel */
-.MMM-Kermis .kermis-datum {
-    font-size: 14px;
-    opacity: 0.8;
-    margin-top: 2px;
-}
-
-/* Kleurindicatie per formaat */
-.MMM-Kermis .kermis-item.klein {
-    border-left: 6px solid #4caf50; /* groen */
-}
-
-.MMM-Kermis .kermis-item.middel {
-    border-left: 6px solid #ff9800; /* oranje */
-}
-
-.MMM-Kermis .kermis-item.groot {
-    border-left: 6px solid #f44336; /* rood */
-}
-
-/* Lege status */
-.MMM-Kermis .kermis-leeg {
-    font-style: italic;
-    opacity: 0.6;
-    padding: 10px;
-}
-
-/* Responsive aanpassing voor kleine schermen */
-@media (max-width: 800px) {
-    .MMM-Kermis .kermis-item {
-        font-size: 16px;
-        padding: 8px 10px;
-        gap: 8px;
-    }
-    .MMM-Kermis .kermis-icoon {
-        font-size: 24px;
-    }
-    .MMM-Kermis .kermis-datum {
-        font-size: 12px;
-    }
-}
-
-/* Aftel-dagen blok rechts */
-.MMM-Kermis .kermis-aftel {
-    font-size: 14px;
-    font-weight: bold;
-    background: #d0f0c0; /* lichtgroen */
-    color: #000; /* zwart voor leesbaarheid */
-    padding: 4px 8px;
+/* Container van één kermis */
+.kermis-item {
+    padding: 6px 10px;       /* minder padding */
     border-radius: 6px;
-    white-space: nowrap;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;                /* minder ruimte tussen icoon, tekst en aftel */
+    font-family: sans-serif;
+    font-size: 0.85rem;      /* iets kleiner */
+}
+
+/* Icoon (🎪🎠🎡) */
+.kermis-icoon {
+    font-size: 1rem;         /* compacter icoon */
+}
+
+/* Tekstcontainer */
+.kermis-item strong {
+    font-size: 0.95rem;      /* titel iets kleiner */
+}
+
+.kermis-datum {
+    font-size: 0.8rem;       /* datum compacter */
+    color: #555;
+}
+
+/* Aftel-dagen */
+.kermis-aftel {
+    font-size: 0.8rem;       /* aftel-dagen compacter */
+    font-weight: bold;
+    color: #333;
+}
+
+/* Als kermis voltooid is */
+.voltooid {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* Leegmelding */
+.kermis-leeg {
+    font-size: 0.85rem;
+    color: #777;
     text-align: center;
-    min-width: 70px;
 }
