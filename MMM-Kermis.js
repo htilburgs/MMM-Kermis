@@ -37,15 +37,20 @@ Module.register("MMM-Kermis", {
         }
 
         const vandaag = new Date();
+        vandaag.setHours(0, 0, 0, 0);
 
         // Filter: niet voltooid + einddatum >= vandaag
         const zichtbaar = this.items
-            .filter(item => {
-                if (item.voltooid) return false;
-                const eind = new Date(item.tot);
-                return eind >= vandaag;
-            })
-            .sort((a, b) => new Date(a.van) - new Date(b.van));
+        .filter(item => {
+        if (item.voltooid) return false;
+
+        const eind = new Date(item.tot);
+        eind.setHours(23, 59, 59, 999);
+
+        return eind >= vandaag;
+        })
+        
+        .sort((a, b) => new Date(a.van) - new Date(b.van));
 
         if (!zichtbaar.length) {
             const leeg = document.createElement("div");
