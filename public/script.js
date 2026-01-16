@@ -1,4 +1,15 @@
 let editId = null; // Huidige wijziging
+let liveData = []; // Houdt de actuele data bij
+
+// WebSocket verbinding
+const ws = new WebSocket(`ws://${window.location.hostname}:3001`);
+ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    if (message.type === "KERMIS_DATA") {
+        liveData = message.data;
+        renderList(); // Update de lijst automatisch
+    }
+};
 
 // Formatteer datum voor weergave dd-mm-yyyy
 function formatDate(dateString) {
@@ -9,13 +20,12 @@ function formatDate(dateString) {
     return `${dag}-${maand}-${jaar}`;
 }
 
-// Load en render de lijst
-async function load() {
-    const res = await fetch("/api/kermis");
-    let data = await res.json();
-
+// Render de lijst
+function renderList() {
     // Sorteer op dropdown
     const sortOpt = document.getElementById("sorteer").value;
+    let data = [...liveData]; // Maak kopie zodat sorteren niet liveData overschrijft
+
     if (sortOpt === "van") data.sort((a, b) => new Date(a.van) - new Date(b.van));
     else if (sortOpt === "tot") data.sort((a, b) => new Date(a.tot) - new Date(b.tot));
     else if (sortOpt === "locatie") data.sort((a, b) => a.locatie.localeCompare(b.locatie));
@@ -59,8 +69,6 @@ async function load() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ voltooid })
             });
-            if (voltooid) kaartInfo.classList.add("voltooid");
-            else kaartInfo.classList.remove("voltooid");
         });
     });
 
@@ -69,7 +77,6 @@ async function load() {
         btn.addEventListener("click", async e => {
             const id = btn.closest(".kermis-kaart").dataset.id;
             await fetch(`/api/kermis/${id}`, { method: "DELETE" });
-            load();
         });
     });
 
@@ -117,11 +124,15 @@ document.getElementById("form").onsubmit = async e => {
     }
 
     e.target.reset();
-    load();
 };
 
 // Sorteer dropdown change
-document.getElementById("sorteer").addEventListener("change", load);
+document.getElementById("sorteer").addEventListener("change", renderList);
 
-// Initial load
-load();
+// Initial load via API (voor oudere browsers of als WebSocket nog niet open is)
+fetch("/api/kermis")
+    .then(res => res.json())
+    .then(data => {
+        liveData = data;
+        renderList();
+    });
