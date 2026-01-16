@@ -34,8 +34,11 @@ Add the module to your modules array in your config.js.
   module: "MMM-Kermis",
   position: "top_left",
   header: "Mijn Kermissen",
-  disabled: fase
-}
+  disabled: false,
+  config: {
+          refreshInterval: 60 * 1000 // 1 minuut
+          }
+},
 ```
 
 ## Load Webinterface for updating the Carnivals (Kermissen)
