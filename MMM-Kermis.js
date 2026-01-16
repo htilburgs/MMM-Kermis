@@ -1,7 +1,8 @@
 Module.register("MMM-Kermis", {
 
     defaults: {
-        refreshInterval: 60 * 1000 // 1 minuut
+        refreshInterval: 60 * 1000, // 1 minuut
+        showMaxItems: null          // standaard: geen limiet
     },
 
     getStyles() {
@@ -36,16 +37,19 @@ Module.register("MMM-Kermis", {
         const vandaag = new Date();
         vandaag.setHours(0, 0, 0, 0);
 
-        const zichtbaar = this.items
+        let zichtbaar = this.items
             .filter(item => {
                 if (item.voltooid) return false;
-
                 const eind = new Date(item.tot);
                 eind.setHours(23, 59, 59, 999);
-
                 return eind >= vandaag;
             })
             .sort((a, b) => new Date(a.van) - new Date(b.van));
+
+        // Limiteer aantal items als showMaxItems is ingesteld
+        if (this.config.showMaxItems && zichtbaar.length > this.config.showMaxItems) {
+            zichtbaar = zichtbaar.slice(0, this.config.showMaxItems);
+        }
 
         if (!zichtbaar.length) {
             wrapper.innerHTML = `<div class="kermis-leeg">Geen actuele kermissen</div>`;
@@ -112,7 +116,6 @@ Module.register("MMM-Kermis", {
 
         const diffTime = start - vandaag;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
         return diffDays < 0 ? 0 : diffDays;
     },
 
@@ -123,4 +126,5 @@ Module.register("MMM-Kermis", {
             year: "numeric"
         });
     }
+
 });
