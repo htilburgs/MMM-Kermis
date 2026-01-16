@@ -58,7 +58,7 @@ module.exports = NodeHelper.create({
 
         // WebSocket verbindingen
         this.wss.on("connection", ws => {
-            console.log("Nieuwe WebSocket verbinding");
+            console.log("New WebSocket connection MMM-Kermis");
             ws.send(JSON.stringify({ type: "KERMIS_DATA", data: this.data }));
         });
 
