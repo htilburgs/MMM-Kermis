@@ -63,8 +63,8 @@ module.exports = NodeHelper.create({
         });
 
         // Server starten op alle netwerkinterfaces
-        this.server.listen(3001, "0.0.0.0", () => {
-            console.log("MMM-Kermis server draait op poort 3001 (http + WebSocket)");
+        this.server.listen(3001, () => {
+            console.log("Webinterface MMM-Kermis runs on port 3001");
         });
     },
 
